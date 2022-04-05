@@ -9,16 +9,20 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class recyclerViewAdapter(private val context: Context):
+class recyclerViewAdapter(private val context: Context,private val listener: INotesRVAdapter):
     RecyclerView.Adapter<recyclerViewAdapter.reminderViewHolder>() {
     val allReminder=ArrayList<reminder>()
     inner class reminderViewHolder(itemView: View):RecyclerView.ViewHolder(itemView){
         val text = itemView.findViewById<TextView>(R.id.text)
         val date = itemView.findViewById<TextView>(R.id.date)
+        val dlt = itemView.findViewById<ImageView>(R.id.deleteButton)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): reminderViewHolder {
         val viewHolder= reminderViewHolder(LayoutInflater.from(context).inflate(R.layout.item,parent,false))
+        viewHolder.dlt.setOnClickListener {
+            listener.ItemDelete(allReminder[viewHolder.adapterPosition])
+        }
         return viewHolder
     }
 
@@ -40,6 +44,5 @@ class recyclerViewAdapter(private val context: Context):
 
 }
 interface INotesRVAdapter{
-    fun onItemClicked(reminder: reminder)
-    fun onNoteClicked(reminder: reminder)
+    fun ItemDelete(reminder: reminder)
 }

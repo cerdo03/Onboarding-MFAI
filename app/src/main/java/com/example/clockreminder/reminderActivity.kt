@@ -1,19 +1,23 @@
 package com.example.clockreminder
 
+import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.app.Dialog
 import android.app.TimePickerDialog
-import androidx.appcompat.app.AppCompatActivity
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
-import android.widget.DatePicker
-import android.widget.TimePicker
-import android.widget.Toast
+import android.view.Window
+import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_reminder.*
 import java.util.*
 
-class reminderActivity : AppCompatActivity(),DatePickerDialog.OnDateSetListener,TimePickerDialog.OnTimeSetListener {
+
+class reminderActivity : AppCompatActivity(),DatePickerDialog.OnDateSetListener,TimePickerDialog.OnTimeSetListener,INotesRVAdapter {
     var day = 0
     var month = 0
     var year = 0
@@ -33,7 +37,7 @@ class reminderActivity : AppCompatActivity(),DatePickerDialog.OnDateSetListener,
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_reminder)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        val adapter = recyclerViewAdapter(this)
+        val adapter = recyclerViewAdapter(this,this)
         recyclerView.adapter=adapter
 
         viewModel = ViewModelProvider(this,
@@ -77,9 +81,27 @@ class reminderActivity : AppCompatActivity(),DatePickerDialog.OnDateSetListener,
     override fun onTimeSet(p0: TimePicker?, p1: Int, p2: Int) {
         saved_hour=p1
         saved_minute=p2
-        Toast.makeText(this,
-            "$saved_day-$saved_month-$saved_year $saved_hour:$saved_minute",Toast.LENGTH_SHORT).show()
-        val rm = reminder("sd","$saved_day-$saved_month-$saved_year $saved_hour:$saved_minute")
-        viewModel.insertReminder(rm)
+        showDialog("$saved_day-$saved_month-$saved_year $saved_hour:$saved_minute")
+
     }
+    private fun showDialog(time:String) {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(true)
+        dialog.setContentView(R.layout.dialog)
+        dialog.findViewById<Button>(R.id.submitButton).setOnClickListener{
+            var remText= dialog.findViewById<EditText>(R.id.reminder_text).text.toString()
+            val rm = reminder(remText,"$saved_day-$saved_month-$saved_year $saved_hour:$saved_minute")
+            viewModel.insertReminder(rm)
+            dialog.dismiss()
+        }
+        dialog.show()
+
+
+    }
+
+    override fun ItemDelete(reminder: reminder) {
+        viewModel.deleteReminder(reminder)
+    }
+
 }
