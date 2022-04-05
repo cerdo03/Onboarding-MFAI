@@ -15,7 +15,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:padding="7dp"
-        android:format12Hour="hh:mm:ss a"
+        android:format12Hour="hh:mm a"
         android:textSize="30dp"
         android:textColor="@color/black"
         android:textAlignment="center"
