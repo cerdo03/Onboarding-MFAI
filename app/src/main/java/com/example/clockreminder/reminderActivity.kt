@@ -1,14 +1,15 @@
 package com.example.clockreminder
 
-import android.app.AlertDialog
-import android.app.DatePickerDialog
-import android.app.Dialog
-import android.app.TimePickerDialog
+import android.app.*
+import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.Window
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
@@ -33,9 +34,13 @@ class reminderActivity : AppCompatActivity(),DatePickerDialog.OnDateSetListener,
 
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_reminder)
+
+
+        createNotificationChannel()
         recyclerView.layoutManager = LinearLayoutManager(this)
         val adapter = recyclerViewAdapter(this,this)
         recyclerView.adapter=adapter
@@ -52,6 +57,56 @@ class reminderActivity : AppCompatActivity(),DatePickerDialog.OnDateSetListener,
 
 
     }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun createNotificationChannel()
+    {
+        val name = "Notif Channel"
+        val desc = "A Description of the Channel"
+        val importance = NotificationManager.IMPORTANCE_DEFAULT
+        val channel = NotificationChannel(channelID, name, importance)
+        channel.description = desc
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
+    }
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun scheduleNotification(message:String,time:Long){
+        val intent = Intent(applicationContext, Notification::class.java)
+        intent.putExtra(titleExtra, "Reminder")
+        intent.putExtra(messageExtra, message)
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            applicationContext,
+            notificationID,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            time,
+            pendingIntent
+        )
+        showAlert(time,"Reminder", message)
+    }
+    private fun showAlert(time: Long, title: String, message: String)
+    {
+        val date = Date(time)
+        val dateFormat = android.text.format.DateFormat.getLongDateFormat(applicationContext)
+        val timeFormat = android.text.format.DateFormat.getTimeFormat(applicationContext)
+
+        AlertDialog.Builder(this)
+            .setTitle("Notification Scheduled")
+            .setMessage(
+                "Title: " + title +
+                        "\nMessage: " + message +
+                        "\nAt: " + dateFormat.format(date) + " " + timeFormat.format(date))
+            .setPositiveButton("Okay"){_,_ ->}
+            .show()
+    }
+
 
     fun addReminder(view: View) {
         pickDate()
@@ -78,13 +133,18 @@ class reminderActivity : AppCompatActivity(),DatePickerDialog.OnDateSetListener,
         TimePickerDialog(this,this,hour,minute,true).show()
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onTimeSet(p0: TimePicker?, p1: Int, p2: Int) {
         saved_hour=p1
         saved_minute=p2
-        showDialog("$saved_day-$saved_month-$saved_year $saved_hour:$saved_minute")
+        val calendar = Calendar.getInstance()
+        calendar.set(saved_year,saved_month,saved_day,saved_hour,saved_minute)
+
+        showDialog("$saved_day-$saved_month-$saved_year $saved_hour:$saved_minute", calendar.timeInMillis)
 
     }
-    private fun showDialog(time:String) {
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun showDialog(time:String, calendar:Long) {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(true)
@@ -93,6 +153,7 @@ class reminderActivity : AppCompatActivity(),DatePickerDialog.OnDateSetListener,
             var remText= dialog.findViewById<EditText>(R.id.reminder_text).text.toString()
             val rm = reminder(remText,"$saved_day-$saved_month-$saved_year $saved_hour:$saved_minute")
             viewModel.insertReminder(rm)
+            scheduleNotification(remText,calendar)
             dialog.dismiss()
         }
         dialog.show()

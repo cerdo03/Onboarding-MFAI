@@ -1,5 +1,7 @@
 package com.example.clockreminder
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -18,4 +20,5 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this,reminderActivity::class.java)
         startActivity(intent)
     }
+
 }
