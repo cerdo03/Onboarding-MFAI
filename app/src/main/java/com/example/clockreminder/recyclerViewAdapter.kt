@@ -23,6 +23,7 @@ class recyclerViewAdapter(private val context: Context,private val listener: INo
         viewHolder.dlt.setOnClickListener {
             listener.ItemDelete(allReminder[viewHolder.adapterPosition])
         }
+
         return viewHolder
     }
 
