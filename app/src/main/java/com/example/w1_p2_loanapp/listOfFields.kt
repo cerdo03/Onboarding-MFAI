@@ -1,6 +1,5 @@
 package com.example.w1_p2_loanapp
 
-import android.location.Address
 
 class listOfFields {
     fun getList():ArrayList<field>{

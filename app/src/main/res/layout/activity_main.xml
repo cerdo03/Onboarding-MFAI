@@ -8,11 +8,21 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+
         android:layout_margin="10dp"
+        tools:listitem="@layout/item"
+        android:id="@+id/recyclerView"
         />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/recyclerView"
+        android:id="@+id/textView"
+        android:text="Click on any field which you want to enter and speak after that"
+        android:layout_margin="40dp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
