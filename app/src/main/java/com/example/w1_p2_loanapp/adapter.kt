@@ -19,7 +19,6 @@ class adapter(private val context: Context,private val labels: ArrayList<field>,
         val label = itemView.findViewById<TextView>(R.id.label)
         val enterDetails  = itemView.findViewById<EditText>(R.id.enterDetails)
 
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): viewHolder {
