@@ -3,7 +3,7 @@ package com.example.w2_p3_colorpicker
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+
 import android.widget.TextView
 import com.github.antonpopoff.colorwheel.ColorWheel
 import com.github.antonpopoff.colorwheel.gradientseekbar.GradientSeekBar
